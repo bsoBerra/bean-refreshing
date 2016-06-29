@@ -16,8 +16,17 @@
         <property name="ignoreUnresolvablePlaceholders" value="true"/>
     </bean>
 
+    <bean id="changeableBean" class="com.stanislav.berdnik.bean.ChangeableBean">
+        <property name="autoviredValue" value="${changeableValue.prop}"/>
+    </bean>
+
+    <bean id="unchangeableBean" class="com.stanislav.berdnik.bean.UnchangeableBean">
+        <property name="autoviredValue" value="${unchangeableValue.prop}"/>
+    </bean>
+
     <bean id="classForAutowiring" class="com.stanislav.berdnik.ClassForAutowiring">
-        <property name="autoviredValue" value="${some.prop}"/>
+        <property name="changeableBean" ref="changeableBean"/>
+        <property name="unchangeableBean" ref="unchangeableBean"/>
     </bean>
 
 </beans>

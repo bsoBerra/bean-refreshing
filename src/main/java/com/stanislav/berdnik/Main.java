@@ -5,6 +5,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.*;
 import java.lang.reflect.Field;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
@@ -14,18 +15,32 @@ public class Main {
         System.out.println("Started");
         readArgumentsAndInitProperties();
         ConfigurableApplicationContext context = new ClassPathXmlApplicationContext("spring/application-context.xml");
-        Object bean = context.getBean("classForAutowiring");
-        Field field = bean.getClass().getDeclaredField("autoviredValue");
-        field.setAccessible(true);
-        System.out.println("field.get(bean): " + field.get(bean));
+        checkBeans(context);
+        String changeableBeanName = "changeableBean";
+        String changeableFieldName = "changeableValue";
+        String unchangeableFieldName = "unchangeableValue";
+        Object changeableBean = context.getBean(changeableBeanName);
+        Object unchangeableBean = context.getBean("unchangeableBean");
+
+        printFiledValue(changeableFieldName, changeableBean);
+        printFiledValue(unchangeableFieldName, unchangeableBean);
+
         increaseNumberFromProp();
+
         readArgumentsAndInitProperties();
         context.refresh();
+        checkBeans(context);
         Object beanAfterRefreshing = context.getBean("classForAutowiring");
         Field fieldAfterRefreshing = bean.getClass().getDeclaredField("autoviredValue");
         fieldAfterRefreshing.setAccessible(true);
         System.out.println("field.get(beanAfterRefreshing): " + fieldAfterRefreshing.get(beanAfterRefreshing));
         System.out.println("Finished");
+    }
+
+    private static void printFiledValue(String fieldName, Object bean) throws NoSuchFieldException, IllegalAccessException {
+        Field changeableField = bean.getClass().getDeclaredField(fieldName);
+        changeableField.setAccessible(true);
+        System.out.println(fieldName + ": " + changeableField.get(bean));
     }
 
     private static void readArgumentsAndInitProperties() throws Exception {
@@ -51,4 +66,11 @@ public class Main {
         bw.write(resultString);
         bw.close();
     }
+
+    private static void checkBeans(ConfigurableApplicationContext context ) {
+        Map<String,ClassForAutowiring > beans =  context.getBeanFactory().getBeansOfType(ClassForAutowiring.class);
+        System.out.println("beans number:" + beans.size());
+
+    }
+
 }

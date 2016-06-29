@@ -1,14 +1,15 @@
 package com.stanislav.berdnik;
 
+import com.stanislav.berdnik.bean.ChangeableBean;
+import com.stanislav.berdnik.bean.UnchangeableBean;
+import org.springframework.beans.factory.annotation.Autowired;
+
 public class ClassForAutowiring {
 
-    Integer autoviredValue;
+    @Autowired
+    ChangeableBean changeableBean;
 
-    public Integer getAutoviredValue() {
-        return autoviredValue;
-    }
+    @Autowired
+    UnchangeableBean unchangeableBean;
 
-    public void setAutoviredValue(Integer autoviredValue) {
-        this.autoviredValue = autoviredValue;
-    }
 }
