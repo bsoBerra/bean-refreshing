@@ -1,5 +1,6 @@
 package com.stanislav.berdnik;
 
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -11,16 +12,23 @@ public class Main {
 
 
     public static void main(String[] args) throws Exception {
+        String changeableBeanName = "changeableBean";
+        String unchangeableBeanName = "unchangeableBean";
+        String classForAutowiringBeanName = "classForAutowiring";
+
+        String changeableFieldName = "changeableValue";
+        String unchangeableFieldName = "unchangeableValue";
+
         System.out.println("Started");
         readArgumentsAndInitProperties();
         ConfigurableApplicationContext context = new ClassPathXmlApplicationContext("spring/application-context.xml");
         checkBeans(context);
-        String changeableBeanName = "changeableBean";
-        String unchangeableBeanName = "unchangeableBean";
-        String changeableFieldName = "changeableValue";
-        String unchangeableFieldName = "unchangeableValue";
         Object changeableBean = context.getBean(changeableBeanName);
         Object unchangeableBean = context.getBean(unchangeableBeanName);
+
+        printBeanInfo(classForAutowiringBeanName, context);
+        printBeanInfo(changeableBeanName, context);
+        printBeanInfo(unchangeableBeanName, context);
 
         printFiledValue(changeableFieldName, changeableBean);
         printFiledValue(unchangeableFieldName, unchangeableBean);
@@ -32,12 +40,23 @@ public class Main {
         Object changeableBeanAfterRefreshing = context.getBean(changeableBeanName);
         Object unchangeableBeanAfterRefreshing = context.getBean(unchangeableBeanName);
 
+        printBeanInfo(classForAutowiringBeanName, context);
+        printBeanInfo(changeableBeanName, context);
+        printBeanInfo(unchangeableBeanName, context);
+
         printFiledValue(changeableFieldName, changeableBeanAfterRefreshing);
         printFiledValue(unchangeableFieldName, unchangeableBeanAfterRefreshing);
 
 //        checkBeans(context);
 
         System.out.println("Finished");
+    }
+
+    private static void printBeanInfo(String classForAutowiringBeanName, ConfigurableApplicationContext context) {
+        BeanDefinition changeableBeanDefenition = context.getBeanFactory().getBeanDefinition(classForAutowiringBeanName);
+        System.out.println("BEAN " + classForAutowiringBeanName + " INFO");
+        System.out.println("changeableBeanDefenition.getBeanClassName(): " + changeableBeanDefenition.getBeanClassName());
+        System.out.println("changeableBeanDefenition.hashCode(): " + changeableBeanDefenition.hashCode());
     }
 
     private static void printFiledValue(String fieldName, Object bean) throws NoSuchFieldException, IllegalAccessException {
