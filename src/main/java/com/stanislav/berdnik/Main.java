@@ -5,8 +5,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.*;
 import java.lang.reflect.Field;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
 
@@ -17,23 +16,27 @@ public class Main {
         ConfigurableApplicationContext context = new ClassPathXmlApplicationContext("spring/application-context.xml");
         checkBeans(context);
         String changeableBeanName = "changeableBean";
+        String unchangeableBeanName = "unchangeableBean";
         String changeableFieldName = "changeableValue";
         String unchangeableFieldName = "unchangeableValue";
         Object changeableBean = context.getBean(changeableBeanName);
-        Object unchangeableBean = context.getBean("unchangeableBean");
+        Object unchangeableBean = context.getBean(unchangeableBeanName);
 
         printFiledValue(changeableFieldName, changeableBean);
         printFiledValue(unchangeableFieldName, unchangeableBean);
 
         increaseNumberFromProp();
 
-        readArgumentsAndInitProperties();
         context.refresh();
-        checkBeans(context);
-        Object beanAfterRefreshing = context.getBean("classForAutowiring");
-        Field fieldAfterRefreshing = bean.getClass().getDeclaredField("autoviredValue");
-        fieldAfterRefreshing.setAccessible(true);
-        System.out.println("field.get(beanAfterRefreshing): " + fieldAfterRefreshing.get(beanAfterRefreshing));
+        System.out.println("AFTER REFRESHING");
+        Object changeableBeanAfterRefreshing = context.getBean(changeableBeanName);
+        Object unchangeableBeanAfterRefreshing = context.getBean(unchangeableBeanName);
+
+        printFiledValue(changeableFieldName, changeableBeanAfterRefreshing);
+        printFiledValue(unchangeableFieldName, unchangeableBeanAfterRefreshing);
+
+//        checkBeans(context);
+
         System.out.println("Finished");
     }
 
@@ -51,20 +54,38 @@ public class Main {
 
     private static void increaseNumberFromProp() throws IOException {
         File file = new File("/home/stas/1.Privat/1.projects/tax_workers/bean-refreshing/conf/test.properties");
-        String propString = new Scanner(file).useDelimiter("\\Z").next();
-        String[] keyValue = propString.split("=");
-        if (!file.exists()) {
-            file.createNewFile();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            List<String> props = null;
+            while ((line = br.readLine()) != null) {
+                if(props == null) {
+                    props = new ArrayList<>();
+                }
+                 props.add(line.trim());
+            }
+            assert props != null;
+            String changeableProp = props.get(0);
+
+            String resultString = increaseValueOfProp(changeableProp);
+
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            FileWriter fw = new FileWriter(file.getAbsoluteFile());
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(resultString + System.getProperty("line.separator") + props.get(1));
+            bw.close();
         }
+    }
+
+    private static String increaseValueOfProp(String changeableValue) {
+        String[] keyValue = changeableValue.split("=");
         String propName = keyValue[0];
         String propValue = keyValue[1];
         Integer propValueIntager = Integer.valueOf(propValue);
         propValueIntager++;
-        String resultString = propName + "=" + propValueIntager;
-        FileWriter fw = new FileWriter(file.getAbsoluteFile());
-        BufferedWriter bw = new BufferedWriter(fw);
-        bw.write(resultString);
-        bw.close();
+        return propName + "=" + propValueIntager;
     }
 
     private static void checkBeans(ConfigurableApplicationContext context ) {

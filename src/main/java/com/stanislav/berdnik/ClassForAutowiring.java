@@ -12,4 +12,19 @@ public class ClassForAutowiring {
     @Autowired
     UnchangeableBean unchangeableBean;
 
+    public ChangeableBean getChangeableBean() {
+        return changeableBean;
+    }
+
+    public void setChangeableBean(ChangeableBean changeableBean) {
+        this.changeableBean = changeableBean;
+    }
+
+    public UnchangeableBean getUnchangeableBean() {
+        return unchangeableBean;
+    }
+
+    public void setUnchangeableBean(UnchangeableBean unchangeableBean) {
+        this.unchangeableBean = unchangeableBean;
+    }
 }

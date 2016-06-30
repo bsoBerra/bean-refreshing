@@ -17,11 +17,11 @@
     </bean>
 
     <bean id="changeableBean" class="com.stanislav.berdnik.bean.ChangeableBean">
-        <property name="autoviredValue" value="${changeableValue.prop}"/>
+        <property name="changeableValue" value="${changeableValue.prop}"/>
     </bean>
 
     <bean id="unchangeableBean" class="com.stanislav.berdnik.bean.UnchangeableBean">
-        <property name="autoviredValue" value="${unchangeableValue.prop}"/>
+        <property name="unchangeableValue" value="${unchangeableValue.prop}"/>
     </bean>
 
     <bean id="classForAutowiring" class="com.stanislav.berdnik.ClassForAutowiring">
